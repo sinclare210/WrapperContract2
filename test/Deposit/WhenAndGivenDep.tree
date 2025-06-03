@@ -1,0 +1,23 @@
+DepositTest
+├── given assetType is ETH
+│   ├── given msg value is 0
+│   │   └── it should revert with CantSendZero
+│   └── given msg value is greater than 0
+│       ├── it should mint msg value amount of WSIN tokens to msg sender
+│       ├── it should increase BalanceInEth by msg value
+│       ├── it should increase BalanceInEthForUser [msg sender] by msg value
+│       ├── it should increase contract's ETH balance by msg value
+│       └── it should emit Deposited(msg sender, msg value, AssetType ETH)
+└── given assetType is TOKEN
+    ├── given _amount is 0
+    │   └── it should revert with CantSendZero
+    └── given _amount is greater than 0
+        ├── given transferFrom fails
+        │   └── it should revert with "SafeERC20: low-level call failed"
+        └── given transferFrom succeeds
+            ├── it should mint _amount of WSIN tokens to msg sender
+            ├── it should transfer _amount tokens from msg sender to contract
+            ├── it should increase contract's token balance by _amount
+            └── it should emit Deposited(msg sender, _amount, AssetType TOKEN)
+
+            

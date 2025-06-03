@@ -1,0 +1,24 @@
+WithdrawTest
+├── given _amount is 0
+│   └── it should revert with CantSendZero
+└── given _amount is greater than 0
+    ├── given msg sender has insufficient WSIN balance
+    │   └── it should revert with "ERC20: burn amount exceeds balance"
+    └── given msg sender has sufficient WSIN balance
+        ├── given assetType is ETH
+        │   ├── given BalanceInEthForUser msg sender less than _amount
+        │   │   └── it should revert with InsufficientFunds
+        │   └── given BalanceInEthForUser msg sender greater than or equal to _amount
+        │       ├── it should burn _amount WSIN tokens from msg sender
+        │       ├── it should decrease BalanceInEthForUser msg sender by _amount
+        │       ├── it should decrease BalanceInEth by _amount
+        │       ├── it should transfer _amount ETH to msg sender
+        │       └── it should emit Withdrawn(msg sender, _amount, AssetType ETH)
+        └── given assetType is TOKEN
+            ├── given contract has insufficient token balance
+            │   └── it should revert with "SafeERC20: low-level call failed"
+            └── given contract has sufficient token balance
+                ├── it should burn _amount WSIN tokens from msg sender
+                ├── it should transfer _amount tokens to msg sender
+                ├── it should decrease contract's token balance by _amount
+                └── it should emit Withdrawn(msg sender, _amount, AssetType TOKEN)
