@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
+import {Test, console} from "forge-std/Test.sol";
 
 import {WrapperContract} from "./../../src/WrapperContract.sol";
 import {WrapperContractTest} from "../WrapperContract.t.sol";
@@ -53,7 +54,7 @@ contract DepositTest is WrapperContractTest {
     }
 
     modifier given_amountIsGreaterThan0() {
-        uint256 amount = 100e18;
+        uint256 amount = 1e18;
         
         vm.startPrank(sinc);
         sinclair.mint(sinc, amount);
@@ -62,14 +63,39 @@ contract DepositTest is WrapperContractTest {
         _;
     }
 
-    function test_GivenTransferFromFails() external givenAssetTypeIsTOKEN given_amountIsGreaterThan0 {
-        // it should revert with "SafeERC20: low-level call failed"
-    }
+   
 
     function test_GivenTransferFromSucceeds() external givenAssetTypeIsTOKEN given_amountIsGreaterThan0 {
         // it should mint _amount of WSIN tokens to msg sender
         // it should transfer _amount tokens from msg sender to contract
         // it should increase contract's token balance by _amount
         // it should emit Deposited(msg sender, _amount, AssetType TOKEN)
+        uint256 initialContractBalance = wrapperContract.balanceOf(address(this));
+        uint256 balanceOfUser = sinclair.balanceOf(sinc);
+        uint256 depositAmount = 1000000;
+        vm.startPrank(sinc);
+        console.log(initialContractBalance);
+        wrapperContract.Deposit(depositAmount);
+
+        assertEq(
+            wrapperContract.balanceOf(sinc),
+            initialContractBalance + depositAmount,
+            "Should mint correct amount of WSIN tokens"
+        );
+        
+        // Verify tokens transferred from user
+        assertEq(
+            sinclair.balanceOf(sinc),
+            balanceOfUser - depositAmount,
+            "Should transfer tokens from user"
+        );
+        
+        // Verify contract's token balance increased
+        assertEq(
+            sinclair.balanceOf(address(wrapperContract)),
+            initialContractBalance + depositAmount,
+            "Should increase contract's token balance"
+        );
+        vm.stopPrank();
     }
 }
