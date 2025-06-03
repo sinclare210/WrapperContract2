@@ -11,6 +11,8 @@ contract WrapperContractTest is Test {
 
     address sinc = address(0x1);
 
+    uint256 public constant DepositAmount = 1 ether;
+
     function setUp() external {
         sinclair = new Sinclair(sinc);
         wrapperContract = new WrapperContract(address(sinclair), WrapperContract.AssetType.TOKEN);

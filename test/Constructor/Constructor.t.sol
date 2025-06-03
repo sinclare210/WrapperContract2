@@ -9,6 +9,7 @@ contract WhenAndGivenTestForConstructor {
 
     function test_Given_tokenAddressIsAddress0() external givenAssetTypeIsTOKEN {
         // it should revert with ZeroAddressNotAllowed
+        
     }
 
     function test_Given_tokenAddressIsValid() external givenAssetTypeIsTOKEN {
