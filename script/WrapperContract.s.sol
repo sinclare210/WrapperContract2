@@ -10,9 +10,11 @@ import {WrapperContract} from "../src/WrapperContract.sol";
 
 contract WrapperContractScript is Script {
     WrapperContract public wrapperContract;
+
     function run() external {
         vm.startBroadcast();
-        wrapperContract = new  WrapperContract(0x866a9Dd11387267A30F89D053B46c47e01f170bB, WrapperContract.AssetType.TOKEN);
+        wrapperContract =
+            new WrapperContract(0x866a9Dd11387267A30F89D053B46c47e01f170bB, WrapperContract.AssetType.TOKEN);
         vm.stopBroadcast();
     }
 }

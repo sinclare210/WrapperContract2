@@ -11,7 +11,6 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  * @notice This contract allows users to deposit either ETH or an ERC20 token and receive wrapped tokens in return.
  * @dev Wrapped tokens are minted 1:1 with the deposited asset (ETH or ERC20).
  */
-
 contract WrapperContract is ERC20 {
     using SafeERC20 for IERC20;
 
@@ -31,7 +30,10 @@ contract WrapperContract is ERC20 {
     event Withdrawn(address indexed user, uint256 amount, AssetType assetType);
 
     /// @notice Enum representing the asset type (ETH or ERC20)
-    enum AssetType { TOKEN, ETH }
+    enum AssetType {
+        TOKEN,
+        ETH
+    }
 
     /// @notice The asset type being wrapped
     AssetType public assetType;
@@ -93,7 +95,7 @@ contract WrapperContract is ERC20 {
             BalanceInEthForUser[msg.sender] -= _amount;
             BalanceInEth -= _amount;
 
-            (bool success, ) = payable(msg.sender).call{value: _amount}("");
+            (bool success,) = payable(msg.sender).call{value: _amount}("");
             require(success, "ETH transfer failed");
             emit Withdrawn(msg.sender, _amount, AssetType.ETH);
         } else {
