@@ -13,6 +13,8 @@ contract WrapperContract is ERC20 {
 
     error CantSendZero();
 
+    error InsufficientFunds();
+
     using SafeERC20 for IERC20;
 
     IERC20 token;
@@ -34,15 +36,34 @@ contract WrapperContract is ERC20 {
     }
 
     uint256 BalanceInEth;
+    mapping (address => uint256) BalanceInEthForUser;
     
     function Deposit (uint256 _amount) public payable{
         if(assetType == AssetType.ETH){
+
             if(msg.value <= 0) revert CantSendZero();
+            BalanceInEth += _amount;
+            BalanceInEthForUser[msg.sender] += _amount;
             _mint(msg.sender,msg.value);
         }else {
             if(_amount <= 0) revert CantSendZero();
             token.safeTransferFrom(msg.sender, address(this), _amount);
             _mint(msg.sender,_amount);
+        }
+    }
+
+    function Withdraw (uint256 _amount) public {
+          if(assetType == AssetType.ETH){
+            if(_amount <= 0) revert CantSendZero();
+            if (BalanceInEthForUser[msg.sender] <= _amount) revert InsufficientFunds();
+            _burn(msg.sender,_amount);
+            (bool success,) =payable(msg.sender).call{value: _amount}("");
+            require(success);
+        }else {
+            if(_amount <= 0) revert CantSendZero();
+            
+            _burn(msg.sender,_amount);
+            token.safeTransfer(msg.sender, _amount);
         }
     }
 
