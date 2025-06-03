@@ -7,6 +7,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 
 
+
 contract WrapperContract is ERC20 {
 
     error ZeroAddressNotAllowed();
@@ -42,8 +43,8 @@ contract WrapperContract is ERC20 {
         if(assetType == AssetType.ETH){
 
             if(msg.value <= 0) revert CantSendZero();
-            BalanceInEth += _amount;
-            BalanceInEthForUser[msg.sender] += _amount;
+            BalanceInEth += msg.value;
+            BalanceInEthForUser[msg.sender] += msg.value;
             _mint(msg.sender,msg.value);
         }else {
             if(_amount <= 0) revert CantSendZero();
@@ -55,8 +56,11 @@ contract WrapperContract is ERC20 {
     function Withdraw (uint256 _amount) public {
           if(assetType == AssetType.ETH){
             if(_amount <= 0) revert CantSendZero();
-            if (BalanceInEthForUser[msg.sender] <= _amount) revert InsufficientFunds();
+            if (BalanceInEthForUser[msg.sender] < _amount) revert InsufficientFunds();
+            BalanceInEth -= _amount;
+            BalanceInEthForUser[msg.sender] -= _amount;
             _burn(msg.sender,_amount);
+
             (bool success,) =payable(msg.sender).call{value: _amount}("");
             require(success);
         }else {
@@ -66,6 +70,8 @@ contract WrapperContract is ERC20 {
             token.safeTransfer(msg.sender, _amount);
         }
     }
+
+    receive() external payable {}
 
 
 }
