@@ -16,9 +16,5 @@ contract WrapperContractTest is Test {
     function setUp() external {
         sinclair = new Sinclair(sinc);
         wrapperContract = new WrapperContract(address(sinclair), WrapperContract.AssetType.TOKEN);
-
-        vm.startPrank(sinc);
-        sinclair.approve(address(wrapperContract), type(uint256).max);
-        vm.stopPrank();
     }
 }

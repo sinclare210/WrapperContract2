@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
+
 import {WrapperContract} from "./../../src/WrapperContract.sol";
 import {WrapperContractTest} from "../WrapperContract.t.sol";
 
@@ -12,7 +13,7 @@ contract DepositTest is WrapperContractTest {
     function test_GivenMsgValueIs0() external givenAssetTypeIsETH {
         // it should revert with CantSendZero
         vm.startPrank(sinc);
-        vm.expectRevert();
+        vm.expectRevert(WrapperContract.CantSendZero.selector);
         wrapperContract.Deposit{value: 0 ether}(0);
         vm.stopPrank();
     }
@@ -27,9 +28,9 @@ contract DepositTest is WrapperContractTest {
         uint256 balanceOfUser = wrapperContract.balanceOf(sinc);
         vm.deal(sinc, 2 ether);
         vm.startPrank(sinc);
-        
+
         wrapperContract.Deposit{value: DepositAmount}(0);
-        assertEq(wrapperContract.BalanceInEth(),initialContractBalance + DepositAmount);
+        assertEq(wrapperContract.BalanceInEth(), initialContractBalance + DepositAmount);
         assertEq(wrapperContract.BalanceInEthForUser(sinc), DepositAmount);
         assertEq(wrapperContract.balanceOf(sinc), balanceOfUser + DepositAmount);
         vm.stopPrank();
@@ -37,14 +38,27 @@ contract DepositTest is WrapperContractTest {
 
     modifier givenAssetTypeIsTOKEN() {
         wrapperContract = new WrapperContract(address(sinclair), WrapperContract.AssetType.TOKEN);
+        vm.startPrank(sinc);
+        sinclair.approve(address(wrapperContract), type(uint256).max);
+        vm.stopPrank();
         _;
     }
 
     function test_Given_amountIs0() external givenAssetTypeIsTOKEN {
         // it should revert with CantSendZero
+        vm.startPrank(sinc);
+        vm.expectRevert(WrapperContract.CantSendZero.selector);
+        wrapperContract.Deposit(0);
+        vm.stopPrank();
     }
 
     modifier given_amountIsGreaterThan0() {
+        uint256 amount = 100e18;
+        
+        vm.startPrank(sinc);
+        sinclair.mint(sinc, amount);
+        sinclair.approve(address(wrapperContract), amount);
+        vm.stopPrank();
         _;
     }
 

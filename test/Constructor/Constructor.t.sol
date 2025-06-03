@@ -3,13 +3,11 @@ pragma solidity ^0.8.28;
 
 contract WhenAndGivenTestForConstructor {
     modifier givenAssetTypeIsTOKEN() {
-
         _;
     }
 
     function test_Given_tokenAddressIsAddress0() external givenAssetTypeIsTOKEN {
         // it should revert with ZeroAddressNotAllowed
-        
     }
 
     function test_Given_tokenAddressIsValid() external givenAssetTypeIsTOKEN {
