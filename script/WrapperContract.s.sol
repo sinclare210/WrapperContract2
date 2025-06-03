@@ -5,6 +5,8 @@ import {Script, console} from "forge-std/Script.sol";
 import {WrapperContract} from "../src/WrapperContract.sol";
 
 // sinclair-0x866a9dd11387267a30f89d053b46c47e01f170bb
+//0x4f378eb1dc3673fd78d795e39cc42745efc9018f
+//https://sepolia.etherscan.io/address/0x4f378eb1dc3673fd78d795e39cc42745efc9018f
 
 contract WrapperContractScript is Script {
     WrapperContract public wrapperContract;
