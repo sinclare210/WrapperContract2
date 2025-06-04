@@ -4,9 +4,7 @@ pragma solidity ^0.8.28;
 import {WrapperContract} from "./../../src/WrapperContract.sol";
 import {WrapperContractTest} from "../WrapperContract.t.sol";
 
-contract WithdrawTest is WrapperContractTest{
-    
-
+contract WithdrawTest is WrapperContractTest {
     function test_Given_amountIs0() external {
         // it should revert with CantSendZero
         vm.startPrank(sinc);
@@ -63,7 +61,7 @@ contract WithdrawTest is WrapperContractTest{
         // it should decrease BalanceInEth by _amount
         // it should transfer _amount ETH to msg sender
         // it should emit Withdrawn(msg sender, _amount, AssetType ETH)
-        
+
         uint256 withdrawAmount = 0.5 ether;
         vm.deal(sinc, 2 ether);
         vm.startPrank(sinc);
@@ -90,28 +88,16 @@ contract WithdrawTest is WrapperContractTest{
         wrapperContract.Withdraw(withdrawAmount);
 
         // Verify WSIN tokens were burned
-        assertEq(
-            wrapperContract.balanceOf(sinc),
-            balanceAfterDeposit - withdrawAmount
-        );
+        assertEq(wrapperContract.balanceOf(sinc), balanceAfterDeposit - withdrawAmount);
 
         // Verify BalanceInEthForUser decreased
-        assertEq(
-            wrapperContract.BalanceInEthForUser(sinc),
-            userEthAfterDeposit - withdrawAmount
-        );
+        assertEq(wrapperContract.BalanceInEthForUser(sinc), userEthAfterDeposit - withdrawAmount);
 
         // Verify BalanceInEth decreased
-        assertEq(
-            wrapperContract.BalanceInEth(),
-            ethBalanceAfterDeposit - withdrawAmount
-        );
+        assertEq(wrapperContract.BalanceInEth(), ethBalanceAfterDeposit - withdrawAmount);
 
         // Verify ETH was transferred to user
-        assertEq(
-            sinc.balance,
-            initialSincEthBalance - DepositAmount + withdrawAmount
-        );
+        assertEq(sinc.balance, initialSincEthBalance - DepositAmount + withdrawAmount);
 
         vm.stopPrank();
     }
@@ -155,50 +141,38 @@ contract WithdrawTest is WrapperContractTest{
         // it should transfer _amount tokens to msg sender
         // it should decrease contract's token balance by _amount
         // it should emit Withdrawn(msg sender, _amount, AssetType TOKEN)
-        
+
         uint256 depositAmount = 50000;
         uint256 withdrawAmount = 10000;
-        
+
         vm.startPrank(sinc);
         sinclair.mint(sinc, 100000);
         sinclair.approve(address(wrapperContract), type(uint256).max);
-        
+
         // Get initial balances
         uint256 initialUserTokenBalance = sinclair.balanceOf(sinc);
         uint256 initialContractTokenBalance = sinclair.balanceOf(address(wrapperContract));
-        
+
         // Make deposit
         wrapperContract.Deposit(depositAmount);
-        
+
         // Get balances after deposit
         uint256 userWSINBalance = wrapperContract.balanceOf(sinc);
         uint256 userTokenAfterDeposit = sinclair.balanceOf(sinc);
         uint256 contractTokenAfterDeposit = sinclair.balanceOf(address(wrapperContract));
-        
+
         // Expect withdrawal event
         vm.expectEmit(true, false, false, true);
         emit Withdrawn(sinc, withdrawAmount, WrapperContract.AssetType.TOKEN);
-        
-        
+
         wrapperContract.Withdraw(withdrawAmount);
-        
-        
-        assertEq(
-            wrapperContract.balanceOf(sinc),
-            userWSINBalance - withdrawAmount
-        );
-        
-        assertEq(
-            sinclair.balanceOf(sinc),
-            userTokenAfterDeposit + withdrawAmount
-            
-        );
-        
-        assertEq(
-            sinclair.balanceOf(address(wrapperContract)),
-            contractTokenAfterDeposit - withdrawAmount
-        );
-        
+
+        assertEq(wrapperContract.balanceOf(sinc), userWSINBalance - withdrawAmount);
+
+        assertEq(sinclair.balanceOf(sinc), userTokenAfterDeposit + withdrawAmount);
+
+        assertEq(sinclair.balanceOf(address(wrapperContract)), contractTokenAfterDeposit - withdrawAmount);
+
         vm.stopPrank();
     }
 

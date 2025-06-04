@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
+
 import {Test, console} from "forge-std/Test.sol";
 
 import {WrapperContract} from "./../../src/WrapperContract.sol";
@@ -55,15 +56,13 @@ contract DepositTest is WrapperContractTest {
 
     modifier given_amountIsGreaterThan0() {
         uint256 amount = 1e18;
-        
+
         vm.startPrank(sinc);
         sinclair.mint(sinc, amount);
         sinclair.approve(address(wrapperContract), amount);
         vm.stopPrank();
         _;
     }
-
-   
 
     function test_GivenTransferFromSucceeds() external givenAssetTypeIsTOKEN given_amountIsGreaterThan0 {
         // it should mint _amount of WSIN tokens to msg sender
@@ -82,14 +81,10 @@ contract DepositTest is WrapperContractTest {
             initialContractBalance + depositAmount,
             "Should mint correct amount of WSIN tokens"
         );
-        
+
         // Verify tokens transferred from user
-        assertEq(
-            sinclair.balanceOf(sinc),
-            balanceOfUser - depositAmount,
-            "Should transfer tokens from user"
-        );
-        
+        assertEq(sinclair.balanceOf(sinc), balanceOfUser - depositAmount, "Should transfer tokens from user");
+
         // Verify contract's token balance increased
         assertEq(
             sinclair.balanceOf(address(wrapperContract)),
